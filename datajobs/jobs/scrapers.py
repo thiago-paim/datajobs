@@ -1,3 +1,4 @@
+from selenium.webdriver.chrome.options import Options
 import time
 import undetected_chromedriver as uc
 
@@ -11,12 +12,15 @@ class IndeedScraper:
     job_path = "/jobs"
     interval = 2
 
-    def __init__(self, q, l="Brasil"):
+    def __init__(self, q, l="Brasil", headless=True):
         self.params = {
             "q": q,
             "l": l,
         }
         self.url = self.build_url()
+        self.options = Options()
+        if headless:
+            self.options.add_argument("--headless=new")
 
     def build_url(self):
         params = "&".join([f"{k}={v}" for k, v in self.params.items()])
@@ -41,6 +45,5 @@ class IndeedScraper:
 
             job = parser.get_job()
             self.jobs.append(job)
-            print(job["title"], job["canonical_url"])
 
         return self.jobs
