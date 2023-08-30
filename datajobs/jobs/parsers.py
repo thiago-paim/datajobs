@@ -13,34 +13,41 @@ class IndeedJobParser:
 
     def get_job(self):
         job = {
-            "html": None,
-            "canonical_url": None,
-            "title": None,
-            "company_info": None,
-            "apply_href": None,
-            "benefits": None,
-            "description": None,
+            "html": "",
+            "url": "",
+            "title": "",
+            "company_info": "",
+            "apply_url": "",
+            "benefits": "",
+            "description": "",
+            # "salary_and_job_info": "",
         }
 
         job["html"] = str(self.soup)
-        job["canonical_url"] = self.soup.select("link[rel='canonical']")[0].attrs[
-            "href"
-        ]
+        job["url"] = self.soup.select("link[rel='canonical']")[0].attrs["href"]
         job["title"] = self.soup.select("h1 span")[0].string
-        job["company_info"] = self.soup.select(
+
+        company_info = self.soup.select(
             "div[data-testid='jobsearch-CompanyInfoContainer']"
         )
+        if company_info:
+            job["company_info"] = str(company_info[0])
+
         apply_button = self.soup.select("div#applyButtonLinkContainer button")
         if apply_button:
-            job["apply_href"] = apply_button[0].attrs["href"]
+            job["apply_url"] = apply_button[0].attrs["href"]
 
         benefits = self.soup.select("div#benefits")
         if benefits:
-            job["benefits"] = benefits[0]
+            job["benefits"] = str(benefits[0])
 
         description = self.soup.select("div#jobDescriptionText")
         if description:
-            job["description"] = description[0]
+            job["description"] = str(description[0])
+
+        # salary_and_job_info = self.soup.select("div#salaryInfoAndJobType")
+        # if salary_and_job_info:
+        #     job["salary_and_job_info"] = str(salary_and_job_info[0])
 
         return job
 
