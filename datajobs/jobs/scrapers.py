@@ -27,7 +27,7 @@ class IndeedScraper:
         return self.domain + self.job_path + "?" + params
 
     def run(self):
-        driver = uc.Chrome()
+        driver = uc.Chrome(options=self.options)
         driver.get(self.url)
 
         self.results_page = driver.page_source
