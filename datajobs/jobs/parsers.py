@@ -24,8 +24,14 @@ class IndeedJobParser:
         }
 
         job["html"] = str(self.soup)
-        job["url"] = self.soup.select("link[rel='canonical']")[0].attrs["href"]
-        job["title"] = self.soup.select("h1 span")[0].string
+
+        url = self.soup.select("link[rel='canonical']")
+        if url:
+            job["url"] = url[0].attrs["href"]
+
+        title = self.soup.select("h1 span")
+        if title:
+            job["title"] = title[0].string
 
         company_info = self.soup.select(
             "div[data-testid='jobsearch-CompanyInfoContainer']"
@@ -105,7 +111,10 @@ class IndeedJobsListParser:
 
         jobcards = self.soup.select("div#mosaic-provider-jobcards div.slider_container")
         for card in jobcards:
-            job = self.get_job_from_card(card)
-            self.jobs.append(job)
+            try:
+                job = self.get_job_from_card(card)
+                self.jobs.append(job)
+            except Exception as e:
+                print(f"Error parsing job card: {e}\ncard={card}")
 
         return self.jobs

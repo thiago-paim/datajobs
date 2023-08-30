@@ -22,28 +22,32 @@ class IndeedScraper:
         if headless:
             self.options.add_argument("--headless=new")
 
+        self.driver = uc.Chrome(options=self.options)
+
     def build_url(self):
         params = "&".join([f"{k}={v}" for k, v in self.params.items()])
         return self.domain + self.job_path + "?" + params
 
     def run(self):
-        driver = uc.Chrome(options=self.options)
-        driver.get(self.url)
+        self.driver.get(self.url)
 
-        self.results_page = driver.page_source
+        self.results_page = self.driver.page_source
         parsed_results = parsers.IndeedJobsListParser(self.results_page)
         self.cards = parsed_results.get_job_cards()
 
         self.jobs = []
         for card in self.cards:
+            job_url = self.domain + card["href"]
             if self.interval:
                 time.sleep(self.interval)
 
-            job_url = self.domain + card["href"]
-            driver.get(job_url)
-            parser = parsers.IndeedJobParser(driver.page_source)
+            try:
+                self.driver.get(job_url)
+                parser = parsers.IndeedJobParser(self.driver.page_source)
 
-            job = parser.get_job()
-            self.jobs.append(job)
+                job = parser.get_job()
+                self.jobs.append(job)
+            except Exception as e:
+                print(f"Error parsing job: {e}\njob_url={job_url}")
 
         return self.jobs
