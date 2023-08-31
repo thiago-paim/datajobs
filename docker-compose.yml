@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  
+  db:
+    container_name: dj_db
+    image: postgres:13
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - ./datajobs/.env
+    ports:
+      - 5432:5432
+
+  # dj_rabbitmq:
+  #   container_name: rabbitmq
+  #   image: rabbitmq
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+
+  datajobs:
+    container_name: datajobs
+    build:
+      context: ./datajobs
+    command: sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./:/usr/src/
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+  # dj_celery:
+  #   container_name: celery
+  #   build:
+  #     context: ./datajobs
+  #   command: celery -A datajobs worker
+  #   volumes:
+  #     - ./:/usr/src/
+  #   env_file:
+  #     - ./datajobs/.env
+  #   depends_on:
+  #     - dj_db
+  #     - dj_rabbitmq
+
+  # dj_flower:
+  #   container_name: flower
+  #   image: mher/flower
+  #   command: celery flower
+  #   ports:
+  #     - 8888:8888
+  #   env_file:
+  #     - ./datajobs/.env
+  #   depends_on:
+  #     - dj_rabbitmq
