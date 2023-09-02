@@ -1,5 +1,5 @@
+from django.utils import timezone
 import logging
-from selenium.webdriver.chrome.options import Options
 import time
 import undetected_chromedriver as uc
 
@@ -13,61 +13,65 @@ class IndeedScraper:
     """Realiza raspagem das vagas encontradas a partir de uma busca na Indeed."""
 
     domain = "https://br.indeed.com"
-    job_path = "/jobs"
-    interval = 2
-    chrome_version = 116
+    search_page_address = "/jobs?"
+    job_page_address = "/viewjob?"
+    path = []
+    interval = 5
+    cloudflare_title = "Just a moment..."  # For dealing with errors
 
-    def __init__(self, q, l="Brasil", headless=True):
-        logger.info(f"Creating IndeedScraper with: q={q}, l={l} headless={headless}")
-        self.params = {
+    def build_search_url(self, params):
+        url_params = "&".join([f"{k}={v}" for k, v in params.items()])
+        return self.search_page_address + url_params
+
+    def build_job_url(self, jk):
+        return self.job_page_address + "jk=" + jk
+
+    def get_page(self, url):
+        logger.info(f"IndeedScraper.get_page({url=})")
+        url = self.domain + url
+        driver = uc.Chrome(headless=True, use_subprocess=False)
+        driver.get(url)
+        page_source = driver.page_source
+        title = driver.title
+        if self.interval:
+            time.sleep(self.interval)
+        driver.quit()
+        self.path.append(url)
+        return title, page_source
+
+    def get_search_results(self, q, l="Brasil"):
+        params = {
             "q": q,
             "l": l,
         }
-        self.url = self.build_url()
+        url = self.build_search_url(params)
+        return self.get_page(url)
 
-        self.options = Options()
-        self.options.add_argument("--incognito")
-        self.options.add_argument("--disable-extensions")
-        self.options.add_argument("--disable-application-cache")
-        self.options.add_argument("--disable-gpu")
-        self.options.add_argument("--remote-debugging-port=9222")
-        self.options.add_argument("--no-sandbox")
-        self.options.add_argument("--disable-setuid-sandbox")
-        self.options.add_argument("--disable-dev-shm-usage")
-        self.options.add_argument("--disable-blink-features=AutomationControlled")
+    def get_job_details(self, jk):
+        url = self.build_job_url(jk)
+        return self.get_page(url)
 
-        if headless:
-            self.options.add_argument("--headless=new")
+    def search_jobs(self, q, l="Brasil"):
+        started_at = timezone.now()
+        logger.info(f"Starting IndeedScraper.search_jobs({q=}, {l=})")
+        _, source = self.get_search_results(q, l)
 
-        self.driver = uc.Chrome(options=self.options, version_main=self.chrome_version)
-
-    def build_url(self):
-        params = "&".join([f"{k}={v}" for k, v in self.params.items()])
-        return self.domain + self.job_path + "?" + params
-
-    def run(self):
-        logger.info(f"Running IndeedScraper with url={self.url}")
-        self.driver.get(self.url)
-
-        self.results_page = self.driver.page_source
-        parsed_results = parsers.IndeedJobsListParser(self.results_page)
-        self.cards = parsed_results.get_job_cards()
-        logger.info(f"Found {len(self.cards)} job cards")
+        search_page = parsers.IndeedJobsListParser(source)
+        job_cards = search_page.get_job_cards()
+        logger.info(f"Found {len(job_cards)} job cards")
 
         self.jobs = []
-        for card in self.cards:
-            job_url = self.domain + card["href"]
-            logger.info(f"Scraping job from url={job_url}")
-            if self.interval:
-                time.sleep(self.interval)
+        for card in job_cards:
+            _, source = self.get_job_details(card["data-jk"])
+            job_page = parsers.IndeedJobParser(source)
+            job = job_page.get_job()
+            logger.info(f"Found job: {job['title']}")
+            self.jobs.append(job)
 
-            try:
-                self.driver.get(job_url)
-                parser = parsers.IndeedJobParser(self.driver.page_source)
+        # To Do: Adicionar paginação
 
-                job = parser.get_job()
-                self.jobs.append(job)
-            except Exception as e:
-                logger.error(f"Error parsing job: {e}\njob_url={job_url}")
-
+        finished_at = timezone.now()
+        logger.info(
+            f"Finishing IndeedScraper.search_jobs({q=}, {l=}): {len(self.jobs)} jobs found, took {finished_at - started_at}"
+        )
         return self.jobs
