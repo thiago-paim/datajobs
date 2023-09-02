@@ -78,24 +78,24 @@ WSGI_APPLICATION = "datajobs.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # For local development testing
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-# For Docker testing
 # DATABASES = {
 #     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": env("POSTGRES_NAME"),
-#         "USER": env("POSTGRES_USER"),
-#         "PASSWORD": env("POSTGRES_PASSWORD"),
-#         "HOST": "dj_db",
-#         "PORT": 5432,
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+# For Docker testing
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_NAME"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": "dj_db",
+        "PORT": 5432,
+    }
+}
 
 
 # Password validation
@@ -156,11 +156,21 @@ LOGGING = {
             "formatter": "verbose",
             "level": "DEBUG",
         },
+        "jobs_file": {
+            "class": "logging.FileHandler",
+            "filename": "jobs.log",
+            "formatter": "verbose",
+            "level": "INFO",
+        },
     },
     "loggers": {
         "": {
             "level": "DEBUG",
             "handlers": ["file"],
+        },
+        "jobs": {
+            "level": "INFO",
+            "handlers": ["jobs_file"],
         },
     },
 }
