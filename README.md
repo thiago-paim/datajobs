@@ -40,7 +40,7 @@
     * Create a super user:
 
         ```bash
-        docker exec -it datajobs python3 manage.py createsuperuser
+        docker exec -it datajobs-django-1 python3 manage.py createsuperuser
         ```
         
     * Then use it to login into the admin: http://localhost:8000/admin/
@@ -51,7 +51,7 @@
 * In case you want to stop all the tasks, you can purge the tasks queue:
 
     ```bash
-    docker exec -it celery celery -A datajobs purge
+    docker exec -it datajobs-celery-1 celery -A datajobs purge
     ```
 
 
@@ -60,7 +60,7 @@
 * Enter Django shell inside the container
 
     ```bash
-    docker exec -it datajobs bash
+    docker exec -it datajobs-django-1 bash
     python3 manage.py shell
     ```
 
@@ -68,6 +68,13 @@
 
     ```python
     from jobs.scrapers import IndeedScraper
-
-    jobs = IndeedScraper(q="python+dados", headless=False).run()
+    scraper = IndeedScraper(q="python+dados", headless=False)
+    jobs = scraper.run()
     ```
+
+
+
+#### Errors found
+
+* `URLError: <urlopen error [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1131)>`
+    * Seems to be a temporary error; retrying after a while works
