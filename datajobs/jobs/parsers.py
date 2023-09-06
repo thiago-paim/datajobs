@@ -2,10 +2,7 @@ from bs4 import BeautifulSoup
 
 
 class IndeedJobParser:
-    """
-    Parser para páginas de detalhes de vagas da Indeed.
-    Exemplo de página: https://br.indeed.com/viewjob?jk=80f70cdd34aa97e8',
-    """
+    """Parser for Indeed job pages."""
 
     def __init__(self, page):
         self.soup = BeautifulSoup(page, "html.parser")
@@ -23,7 +20,7 @@ class IndeedJobParser:
             # "salary_and_job_info": "",
         }
 
-        job["html"] = str(self.soup)
+        # job["html"] = str(self.soup)
 
         url = self.soup.select("link[rel='canonical']")
         if url:
@@ -33,19 +30,19 @@ class IndeedJobParser:
         if title:
             job["title"] = title[0].string
 
-        company_info = self.soup.select(
-            "div[data-testid='jobsearch-CompanyInfoContainer']"
-        )
-        if company_info:
-            job["company_info"] = str(company_info[0])
+        # company_info = self.soup.select(
+        #     "div[data-testid='jobsearch-CompanyInfoContainer']"
+        # )
+        # if company_info:
+        #     job["company_info"] = str(company_info[0])
 
-        apply_button = self.soup.select("div#applyButtonLinkContainer button")
-        if apply_button:
-            job["apply_url"] = apply_button[0].attrs["href"]
+        # apply_button = self.soup.select("div#applyButtonLinkContainer button")
+        # if apply_button:
+        #     job["apply_url"] = apply_button[0].attrs["href"]
 
-        benefits = self.soup.select("div#benefits")
-        if benefits:
-            job["benefits"] = str(benefits[0])
+        # benefits = self.soup.select("div#benefits")
+        # if benefits:
+        #     job["benefits"] = str(benefits[0])
 
         description = self.soup.select("div#jobDescriptionText")
         if description:
@@ -59,10 +56,7 @@ class IndeedJobParser:
 
 
 class IndeedJobsListParser:
-    """
-    Parser para páginas de listagem de vagas da Indeed.
-    Exemplo de página: https://br.indeed.com/jobs?q=python+dados&l=Brasil
-    """
+    """Parser for Indeed search results pages."""
 
     def __init__(self, page):
         self.soup = BeautifulSoup(page, "html.parser")
@@ -116,14 +110,14 @@ class IndeedJobsListParser:
         return self.jobs
 
     def get_next_page_url(self):
-        next_page = self.soup.select("a[data-testid='pagination-page-next']")
+        next_page = self.soup.select("link[rel='next']")
         if next_page:
             return next_page[0].attrs["href"]
         else:
             return None
 
     def get_previous_page_url(self):
-        prev_page = self.soup.select("a[data-testid='pagination-page-prev']")
+        prev_page = self.soup.select("link[rel='prev']")
         if prev_page:
             return prev_page[0].attrs["href"]
         else:

@@ -2,8 +2,10 @@ from django.conf import settings
 
 file_path = f"{settings.BASE_DIR}/jobs/fixtures/indeed/"
 file_names = [
-    "q-python-dados",
-    "q-python-django-l-remoto",
+    "search-results-short",
+    "search-results-full",
+    "job-details-1",
+    "job-details-2",
 ]
 
 pages = {}
@@ -13,9 +15,45 @@ for name in file_names:
         page = file.read()
         pages[name] = page
 
+job_details = {}
+job_details["job-details-1"] = {
+    "html": "",
+    "url": "",
+    "title": "Vaga Estágio 1",
+    "company_info": "",
+    "apply_url": "",
+    "benefits": "",
+    "description": '<div class="jobsearch-jobDescriptionText jobsearch-JobComponent-description css-1x2lix0 eu4oa1w0" id="jobDescriptionText">\n<div>\n<p>Lorem Ipsum.</p>\n<b><br/> Responsabilidades e atribuições</b>\n<br/>\n<ul>\n<li> Responsabilidade 1;</li>\n<li> Responsabilidade 2;</li>\n</ul>\n<br/>\n<b> Requisitos e qualificações</b>\n<br/>\n<ul>\n<li> Requisito 1;</li>\n<li> Requisito 2;</li>\n</ul>\n</div>\n</div>',
+}
+job_details["job-details-2"] = {
+    "html": "",
+    "url": "",
+    "title": "Vaga Estágio 2",
+    "company_info": "",
+    "apply_url": "",
+    "benefits": "",
+    "description": '<div class="jobsearch-jobDescriptionText jobsearch-JobComponent-description css-1x2lix0 eu4oa1w0" id="jobDescriptionText">\n<div>\n<p>Lorem Ipsum 2.</p>\n<b>Responsabilidades e atribuições</b>\n<ul>\n<li> Responsabilidade 1;</li>\n<li> Responsabilidade 2;</li>\n</ul>\n</div>\n</div>',
+}
+
 
 job_cards = {}
-job_cards["q-python-dados"] = [
+job_cards["search-results-short"] = [
+    {
+        "title": "Estagiário de Dados e MIS",
+        "data-jk": "ce75845b0f6a82e3",
+        "href": "/pagead/clk?mo=r&ad=-6NYlbfkN0DcjF4Y0eKv0CsWWlZ5x9FrC41SbkkqrPAuVGRE_5Udo6HU-pVpgJFNdcRqGotqWyzs3qIxTfs5G6XJtrjkCjVZNinEjjfR1q4VG4U8NdRlJZp_c-Asb_3XeegoxnNwDktvRqxnRM7pnD9Y5GYFxW5ZdB4Yjugaf6vj5gNkFpugHgwfrk0gmeU010KVlzqYWvlu9DAqvo_bwRXN6BGzFost7p5ZYFnTAgzorT19qmkkR2QsIBQDY7cN8_fRBp8ztqJ4epu97hs3esFg70umKZyMk2RsTQd16LOG8rs7Xj0Kcn8HOV178E2gqp53_trM30hktaDIAehHQ2LPISIkm1-pjs8XACH_sUOO-nJ85bXtinnuEYtMYAoqmOPYWKQc8UlYORWU-DnQaauujhEXMXS-6U7XG875vv8k4zbEto0rDTsIRwC__jHs-AeqojExL_kuMXNqnrekIOT4SvAXolhEGnFg6IwJkmYk_Kox3JlnnGoOYoxjeYvNXonJYuWhLrUyKKWn6LrADCtBvvBeFTUrK1c_Zr3hFIkXiJXOlcnICordGyCihhNb7ys031K50fSeb4j_wFdffA==&xkcb=SoAU-_M3LhNgu-QiyB0IbzkdCdPP&p=0&fvj=0&vjs=3",
+        "company_name": "Digio",
+        "company_location": None,
+    },
+    {
+        "title": "Cientista De Dados Júnior",
+        "data-jk": "5d482db843f4b802",
+        "href": "/pagead/clk?mo=r&ad=-6NYlbfkN0DK20QmcZKVx9LjbuC-u5lB3rxeJCP2k8q23I1ohXQB_Ju63qY-73nzSCYa_ovISxbTFJwYvE9qLAaUXpiMGF-XYX_0zZxmDXqyUrn9EaJ8gKzIOVeke5-ziMTXuFL7X30LDQvNH76OAfFA2PrgoJaH0azfzyG1CRbEgEV6rb5aPBTxFUDIiHZG86fFOOX1Qc-9VjRjVjduQuuPSnbmNHlrhIYJhjAdvLQyhLvoyAxsNVAycNwVwhHakeTSSShyFf1kVJKJMK5t7gMbjWEAIi4wrsSYJnkVDn7-uZra_O7FjkcRkplyP7LMBASZ-0YnZ99NcVUBSpAst3QU624PAtncnnGgWkoLZHxBzIaolxVmdoGN5ZodJ2VhgGeIHk9FG8bTBCKgDFOVCtS-AxF8NQ10v_JWQUQKQbv91lX8rYIg7i7KtZv2dKKH2waBGHHa0JU6bkIvC7ZfCQiSlcix30Ec-vGNtNHMpb1SuLU5r6W3dETJ4_UI-s4Wzeu2h0cYiHoNI4r5cbOUYNqnihbrQQQJDSK3R8SnWXSgRxT0CvYVfoZ03McEieH0n5DXNvUSEIA=&xkcb=SoCa-_M3LhNgu-QiyB0PbzkdCdPP&p=1&fvj=0&vjs=3",
+        "company_name": "Claro",
+        "company_location": "São Paulo, SP",
+    },
+]
+job_cards["search-results-full"] = [
     {
         "title": "Estagiário de Dados e MIS",
         "data-jk": "ce75845b0f6a82e3",

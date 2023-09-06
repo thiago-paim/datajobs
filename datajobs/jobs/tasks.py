@@ -13,12 +13,12 @@ def scrape_indeed_query(q):
     started_at = timezone.now()
     logger.info(f"Starting scrape_indeed_query({q=})")
     scraper = IndeedScraper()
-    jobs = scraper.search_jobs(q=q)
+    jobs = scraper.query_jobs(q=q)
 
     created = []
     updated = []
     for job in jobs:
-        j, created = Job.objects.get_or_create(url=job["url"], defaults=job)
+        j, created = Job.objects.update_or_create(url=job["url"], defaults=job)
         if not created:
             j.title = job["title"]
             j.apply_url = job["apply_url"]
