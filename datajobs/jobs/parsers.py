@@ -61,7 +61,7 @@ class IndeedJobParser:
 class IndeedJobsListParser:
     """
     Parser para páginas de listagem de vagas da Indeed.
-    Exemplo de página: https://br.indeed.com/jobs?q=python+dados&l=Brasil&vjk=80f70cdd34aa97e8
+    Exemplo de página: https://br.indeed.com/jobs?q=python+dados&l=Brasil
     """
 
     def __init__(self, page):
@@ -70,39 +70,35 @@ class IndeedJobsListParser:
     def get_job_from_card(self, card):
         job = {
             "title": None,
-            "a": None,
             "data-jk": None,
             "href": None,
             "company_name": None,
             "company_location": None,
-            "metadata": None,
-            "job_snippet": None,
-            "posted_date": None,
+            # "metadata": None,
+            # "job_snippet": None,
+            # "posted_date": None,
         }
         job["title"] = card.select("h2.jobTitle span")[0].string
-        job["a"] = card.select("a")[0]
-        job["data-jk"] = card.select("a")[0].attrs[
-            "data-jk"
-        ]  # Parece ser o ID do anúncio
+        job["data-jk"] = card.select("a")[0].attrs["data-jk"]  # ID do anúncio
         job["href"] = card.select("a")[0].attrs["href"]
 
         company_name = card.select("span.companyName")
         if company_name:
-            job["company_name"] = company_name[0]
+            job["company_name"] = company_name[0].string
 
         company_location = card.select("div.companyLocation")
         if company_location:
-            job["company_location"] = company_location[0]
+            job["company_location"] = company_location[0].string
 
-        metadata = card.select("div.metadata")
-        if metadata:
-            job["metadata"] = metadata[0]
+        # metadata = card.select("div.metadata")
+        # if metadata:
+        #     job["metadata"] = metadata[0]
 
-        job_snippet = card.select("div.job-snippet")
-        if job_snippet:
-            job["job_snippet"] = job_snippet[0]
+        # job_snippet = card.select("div.job-snippet")
+        # if job_snippet:
+        #     job["job_snippet"] = job_snippet[0]
 
-        job["posted_date"] = card.select("table.jobCardShelfContainer span.date")[0]
+        # job["posted_date"] = card.select("table.jobCardShelfContainer span.date")[0]
 
         return job
 
@@ -118,3 +114,17 @@ class IndeedJobsListParser:
                 print(f"Error parsing job card: {e}\ncard={card}")
 
         return self.jobs
+
+    def get_next_page_url(self):
+        next_page = self.soup.select("a[data-testid='pagination-page-next']")
+        if next_page:
+            return next_page[0].attrs["href"]
+        else:
+            return None
+
+    def get_previous_page_url(self):
+        prev_page = self.soup.select("a[data-testid='pagination-page-prev']")
+        if prev_page:
+            return prev_page[0].attrs["href"]
+        else:
+            return None

@@ -57,6 +57,12 @@
 
 ### Testing
 
+* Run automated tests:
+
+    ```bash
+    docker exec -it datajobs-django-1 python3 manage.py test
+    ```
+
 * Enter Django shell inside the container
 
     ```bash
