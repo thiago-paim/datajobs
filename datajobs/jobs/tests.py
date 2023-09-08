@@ -1,9 +1,15 @@
 from unittest.mock import patch, call
 from django.test import TestCase
 
-from jobs.fixtures.indeed import pages, job_cards, job_details
+from jobs.fixtures.indeed import pages, job_cards, job_details, mosaic_jobcards
 from jobs.parsers import IndeedJobsListParser, IndeedJobParser
 from jobs.scrapers import IndeedScraper
+from jobs.tasks import scrape_indeed_list_url
+
+
+class IndeedJobFormTest(TestCase):
+    def test_valid_job(self):
+        ...
 
 
 class IndeedJobsListParserTest(TestCase):
@@ -32,11 +38,20 @@ class IndeedJobsListParserTest(TestCase):
         prev_page = parser.get_previous_page_url()
         self.assertEqual(prev_page, None)
 
+    def test_get_mosaic_jobcards(self):
+        parser = IndeedJobsListParser(pages["search-results-full-mosaic"])
+        jobcards = parser.get_mosaic_provider_jobcards()
+        self.assertEqual(
+            jobcards,
+            mosaic_jobcards["search-results-full-mosaic"],
+        )
+
 
 class IndeedJobParserTest(TestCase):
     def test_get_job(self):
         parser = IndeedJobParser(pages["job-details-1"])
         job = parser.get_job()
+
         self.assertEqual(
             job,
             job_details["job-details-1"],
@@ -105,4 +120,21 @@ class IndeedScraperTest(TestCase):
                 job_details["job-details-1"],
                 job_details["job-details-2"],
             ],
+        )
+
+
+class JobTasksTest(TestCase):
+    @patch("jobs.scrapers.IndeedScraper.get_page")
+    def test_scrape_indeed_list_url(self, get_page_mock):
+        get_page_mock.side_effect = [pages["search-results-full-mosaic"]]
+
+        c, u = scrape_indeed_list_url("/jobs?q=query&l=Location")
+
+        created_jobkeys = [job.jobkey for job in c]
+        updated_jobkeys = [job.jobkey for job in u]
+
+        self.assertEqual(updated_jobkeys, [])
+        self.assertEqual(
+            created_jobkeys,
+            [job["jobkey"] for job in mosaic_jobcards["search-results-full-mosaic"]],
         )

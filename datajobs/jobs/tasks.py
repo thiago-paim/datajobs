@@ -6,6 +6,31 @@ from jobs.models import Job
 logger = logging.getLogger(__name__)
 
 
+def scrape_indeed_list_url(url):
+    started_at = timezone.now()
+    logger.info(f"Starting scrape_indeed_list_url({url=})")
+    scraper = IndeedScraper()
+    jobcards = scraper.get_jobcards_by_url(url=url)
+
+    created_jobs = []
+    updated_jobs = []
+    for jobcard in jobcards:
+        job, created = Job.objects.update_or_create(
+            jobkey=jobcard["jobkey"], defaults=jobcard
+        )
+        if created:
+            created_jobs.append(job)
+        else:
+            updated_jobs.append(job)
+
+    finished_at = timezone.now()
+    logger.info(
+        f"Finishing scrape_indeed_list_url({url=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, took {finished_at - started_at}"
+    )
+    return created_jobs, updated_jobs
+
+
+# TODO: Refactor
 def scrape_indeed_query(q):
     """
     Scrapes Indeed jobs for a given query.

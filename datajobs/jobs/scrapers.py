@@ -13,17 +13,24 @@ class IndeedScraper:
     """Realiza raspagem das vagas encontradas a partir de uma busca na Indeed."""
 
     domain = "https://br.indeed.com"
-    search_page_address = "/jobs?"
-    job_page_address = "/viewjob?"
+    search_page_address = "/jobs"
+    job_page_address = "/viewjob"
     path = []
     interval = 5
 
-    def build_job_url(self, jk):
-        return self.job_page_address + "jk=" + jk
+    def format_url_params(self, params):
+        if not params:
+            return ""
+        return "?" + "&".join([f"{k}={v}" for k, v in params.items()])
 
-    def build_search_url(self, params):
-        url_params = "&".join([f"{k}={v}" for k, v in params.items()])
-        return self.search_page_address + url_params
+    def get_job_url(self, jk):
+        params = {
+            "jk": jk,
+        }
+        return self.job_page_address + self.format_url_params(params)
+
+    def get_query_url(self, params):
+        return self.search_page_address + self.format_url_params(params)
 
     def get_page(self, url):
         """Uses undetected Chrome driver to get a page HTML."""
@@ -32,40 +39,48 @@ class IndeedScraper:
         driver = uc.Chrome(headless=True, use_subprocess=False)
         driver.get(url)
         page_source = driver.page_source
+
+        self.path.append(url)
         if self.interval:
             time.sleep(self.interval)
         driver.quit()
-        self.path.append(url)
         return page_source
 
     def get_job_details(self, jk):
         """Returns the HTML of a job details page."""
-        url = self.build_job_url(jk)
+        url = self.get_job_url(jk)
         return self.get_page(url)
 
+    def get_jobcards_by_url(self, url):
+        page_source = self.get_page(url)
+        parser = parsers.IndeedJobsListParser(page_source)
+        return parser.get_mosaic_provider_jobcards()
+
+    # TODO: Refactor this method to use get_jobcards_by_url and move next_page logic to tasks
     def query_jobs(self, q, l="Brasil"):
         """Executes a query and returns the jobs found (across all pages)."""
         params = {
             "q": q,
             "l": l,
         }
-        url = self.build_search_url(params)
-        jobs, next = self.search_jobs_by_url(url)
+        url = self.get_query_url(params)
+        jobs, n = self.search_jobs_by_url(url)
 
-        while next:
-            j, next = self.search_jobs_by_url(next)
+        while n:
+            j, n = self.search_jobs_by_url(n)
             jobs += j
 
         return jobs
 
+    # TODO: Refactor this method to use get_jobcards_by_url
     def search_jobs_by_url(self, url):
         """Return the jobs found in a given search page URL."""
         started_at = timezone.now()
         logger.info(f"Starting IndeedScraper.search_jobs_by_url({url=})")
         page_source = self.get_page(url)
-        page = parsers.IndeedJobsListParser(page_source)
+        parser = parsers.IndeedJobsListParser(page_source)
 
-        job_cards = page.get_job_cards()
+        job_cards = parser.get_job_cards()
         logger.info(f"Found {len(job_cards)} job cards")
 
         jobs = []
@@ -76,10 +91,10 @@ class IndeedScraper:
             logger.info(f"Found job: {job['title']}")
             jobs.append(job)
 
-        next = page.get_next_page_url()
+        n = parser.get_next_page_url()
 
         finished_at = timezone.now()
         logger.info(
             f"Finishing IndeedScraper.search_jobs_by_url({url=}): {len(jobs)} jobs found, took {finished_at - started_at}"
         )
-        return jobs, next
+        return jobs, n

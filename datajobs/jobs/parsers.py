@@ -1,4 +1,8 @@
 from bs4 import BeautifulSoup
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class IndeedJobParser:
@@ -30,11 +34,11 @@ class IndeedJobParser:
         if title:
             job["title"] = title[0].string
 
-        # company_info = self.soup.select(
-        #     "div[data-testid='jobsearch-CompanyInfoContainer']"
-        # )
-        # if company_info:
-        #     job["company_info"] = str(company_info[0])
+        company_info = self.soup.select(
+            "div[data-testid='jobsearch-CompanyInfoContainer']"
+        )
+        if company_info:
+            job["company_info"] = company_info[0].get_text().strip("\n")
 
         # apply_button = self.soup.select("div#applyButtonLinkContainer button")
         # if apply_button:
@@ -46,7 +50,7 @@ class IndeedJobParser:
 
         description = self.soup.select("div#jobDescriptionText")
         if description:
-            job["description"] = str(description[0])
+            job["description"] = description[0].get_text().strip("\n")
 
         # salary_and_job_info = self.soup.select("div#salaryInfoAndJobType")
         # if salary_and_job_info:
@@ -105,7 +109,7 @@ class IndeedJobsListParser:
                 job = self.get_job_from_card(card)
                 self.jobs.append(job)
             except Exception as e:
-                print(f"Error parsing job card: {e}\ncard={card}")
+                logger.error(f"Error parsing job card: {e}\ncard={card}")
 
         return self.jobs
 
@@ -122,3 +126,29 @@ class IndeedJobsListParser:
             return prev_page[0].attrs["href"]
         else:
             return None
+
+    def get_mosaic_provider_jobcards(self):
+        script = self.soup.select("script#mosaic-data")
+        if not script:
+            return None
+
+        line_start = 'providerData["mosaic-provider-jobcards"]'
+        lines = script[0].text.strip().split("window.mosaic.")
+        line = [line.strip().strip(";") for line in lines if line_start in line][0]
+        data = line[len(line_start) :].strip().strip("=")
+
+        jobcards = json.loads(data)
+        results = jobcards["metaData"]["mosaicProviderJobCardsModel"]["results"]
+        jobs = [
+            {
+                "jobkey": result["jobkey"],
+                "url": f"/viewjob?jk={result['jobkey']}",
+                "title": result["displayTitle"],
+                "company": result["company"],
+                "location": result["formattedLocation"],
+                "relative_time": result["formattedRelativeTime"],
+                # "attributes": result["taxonomyAttributes"],
+            }
+            for result in results
+        ]
+        return jobs
