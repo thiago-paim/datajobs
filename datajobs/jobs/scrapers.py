@@ -1,6 +1,7 @@
 from django.utils import timezone
 import logging
 import time
+import traceback
 import undetected_chromedriver as uc
 
 from jobs import parsers
@@ -36,13 +37,20 @@ class IndeedScraper:
         """Uses undetected Chrome driver to get a page HTML."""
         logger.info(f"IndeedScraper.get_page({url=})")
         url = self.domain + url
-        driver = uc.Chrome(headless=True, use_subprocess=False)
-        driver.get(url)
-        page_source = driver.page_source
-
         self.path.append(url)
+        driver = uc.Chrome(headless=True, use_subprocess=False)
+
+        try:
+            driver.get(url)
+            page_source = driver.page_source
+        except Exception as exc:
+            tb = traceback.format_exc()
+            logger.error(f"IndeedScraper.get_page({url=}: {exc}:\n{tb}")
+            raise exc
+
         if self.interval:
             time.sleep(self.interval)
+
         driver.quit()
         return page_source
 
