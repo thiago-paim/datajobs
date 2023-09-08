@@ -177,7 +177,7 @@ LOGGING = {
         },
         "jobs.management": {
             "level": "INFO",
-            "handlers": ["jobs_file", "console"],
+            "handlers": ["console"],
         },
     },
 }
