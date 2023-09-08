@@ -20,10 +20,16 @@
 
 ## How to run
 
-* Start the containers, and the API will run on http://localhost:8000/
+* Start the containers, and the app will run on http://localhost:8000/
 
     ```bash
     docker compose up -d
+    ```
+
+* To scrape a query from Indeed:
+
+    ```bash
+    docker exec -it datajobs-django-1 python3 scrape_indeed_query "python+dados" "Remoto"
     ```
 
 * To stop your app:
@@ -46,13 +52,13 @@
     * Then use it to login into the admin: http://localhost:8000/admin/
 
 
-* To monitor running tasks check Celery Flower: http://localhost:8888/
+<!-- * To monitor running tasks check Celery Flower: http://localhost:8888/
 
 * In case you want to stop all the tasks, you can purge the tasks queue:
 
     ```bash
     docker exec -it datajobs-celery-1 celery -A datajobs purge
-    ```
+    ``` -->
 
 
 ### Testing
@@ -73,9 +79,9 @@
 * Then: 
 
     ```python
-    from jobs.scrapers import IndeedScraper
-    scraper = IndeedScraper(q="python+dados", headless=False)
-    jobs = scraper.run()
+    from jobs.tasks import scrape_indeed_list_url
+    url = "/jobs?q=python+dados&l="
+    created, updated = scrape_indeed_list_url(url)
     ```
 
 

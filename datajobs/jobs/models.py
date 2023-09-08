@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 
 
 class Job(models.Model):
@@ -14,3 +15,15 @@ class Job(models.Model):
     apply_url = models.URLField(blank=True)
     benefits = models.TextField(blank=True)
     html = models.TextField(blank=True)
+
+    def to_dict(self):
+        d = model_to_dict(self)
+        d.pop("id")
+        d.pop("html")
+        d["url"] = self.get_complete_url()
+        d["created"] = self.created.isoformat()
+        d["updated"] = self.updated.isoformat()
+        return d
+
+    def get_complete_url(self):
+        return f"https://www.indeed.com/viewjob?jk={self.jobkey}"

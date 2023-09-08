@@ -6,6 +6,13 @@ from jobs.models import Job
 logger = logging.getLogger(__name__)
 
 
+def scrape_indeed_list_by_query(q, l="Brasil"):
+    scraper = IndeedScraper()
+    params = {"q": q, "l": l}
+    url = scraper.get_query_url(params)
+    return scrape_indeed_list_url(url)
+
+
 def scrape_indeed_list_url(url):
     started_at = timezone.now()
     logger.info(f"Starting scrape_indeed_list_url({url=})")

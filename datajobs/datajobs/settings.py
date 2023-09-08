@@ -150,6 +150,9 @@ LOGGING = {
         },
     },
     "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
         "file": {
             "class": "logging.FileHandler",
             "filename": "general.log",
@@ -172,6 +175,10 @@ LOGGING = {
             "level": "INFO",
             "handlers": ["jobs_file"],
         },
+        "jobs.management": {
+            "level": "INFO",
+            "handlers": ["jobs_file", "console"],
+        },
     },
 }
 
@@ -179,3 +186,6 @@ LOGGING = {
 # Celery config
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 FLOWER_PORT = env("FLOWER_PORT")
+
+
+DEFAULT_EXPORT_PATH = f"{BASE_DIR}/exports/"
