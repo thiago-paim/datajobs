@@ -54,17 +54,17 @@ class IndeedScraper:
         driver.quit()
         return page_source
 
+    def get_parsed_search_page(self, url):
+        page_source = self.get_page(url)
+        return parsers.IndeedJobsListParser(page_source)
+
+    # TODO: Refactor to return parsed page
     def get_job_details(self, jk):
         """Returns the HTML of a job details page."""
         url = self.get_job_url(jk)
         return self.get_page(url)
 
-    def get_jobcards_by_url(self, url):
-        page_source = self.get_page(url)
-        parser = parsers.IndeedJobsListParser(page_source)
-        return parser.get_mosaic_provider_jobcards()
-
-    # TODO: Refactor this method to use get_jobcards_by_url and move next_page logic to tasks
+    # TODO: Refactor this method
     def query_jobs(self, q, l="Brasil"):
         """Executes a query and returns the jobs found (across all pages)."""
         params = {
@@ -80,7 +80,7 @@ class IndeedScraper:
 
         return jobs
 
-    # TODO: Refactor this method to use get_jobcards_by_url
+    # TODO: Refactor this method
     def search_jobs_by_url(self, url):
         """Return the jobs found in a given search page URL."""
         started_at = timezone.now()

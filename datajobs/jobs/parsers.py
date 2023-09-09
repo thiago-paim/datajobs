@@ -65,6 +65,13 @@ class IndeedJobsListParser:
     def __init__(self, page):
         self.soup = BeautifulSoup(page, "html.parser")
 
+    def get_jobs_count(self):
+        count = self.soup.select("div.jobsearch-JobCountAndSortPane-jobCount")
+        if count:
+            return count[0].text.split(" ")[0]
+        else:
+            return None
+
     def get_job_from_card(self, card):
         job = {
             "title": None,
@@ -141,12 +148,12 @@ class IndeedJobsListParser:
         results = jobcards["metaData"]["mosaicProviderJobCardsModel"]["results"]
         jobs = [
             {
-                "jobkey": result["jobkey"],
+                "jobkey": result["jobkey"][:50],
                 "url": f"/viewjob?jk={result['jobkey']}",
-                "title": result["displayTitle"],
-                "company": result["company"],
-                "location": result["formattedLocation"],
-                "relative_time": result["formattedRelativeTime"],
+                "title": result["displayTitle"][:100],
+                "company": result["company"][:100],
+                "location": result["formattedLocation"][:100],
+                "relative_time": result["formattedRelativeTime"][:50],
                 # "attributes": result["taxonomyAttributes"],
             }
             for result in results

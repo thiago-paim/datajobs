@@ -46,6 +46,9 @@ class IndeedJobsListParserTest(TestCase):
             mosaic_jobcards["search-results-full-mosaic"],
         )
 
+    def test_get_mosaic_trimmed_jobcards(self):
+        ...
+
 
 class IndeedJobParserTest(TestCase):
     def test_get_job(self):

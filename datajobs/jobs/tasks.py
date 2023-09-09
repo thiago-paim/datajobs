@@ -6,19 +6,7 @@ from jobs.models import Job
 logger = logging.getLogger(__name__)
 
 
-def scrape_indeed_list_by_query(q, l="Brasil"):
-    scraper = IndeedScraper()
-    params = {"q": q, "l": l}
-    url = scraper.get_query_url(params)
-    return scrape_indeed_list_url(url)
-
-
-def scrape_indeed_list_url(url):
-    started_at = timezone.now()
-    logger.info(f"Starting scrape_indeed_list_url({url=})")
-    scraper = IndeedScraper()
-    jobcards = scraper.get_jobcards_by_url(url=url)
-
+def save_jobcards(jobcards):
     created_jobs = []
     updated_jobs = []
     for jobcard in jobcards:
@@ -29,6 +17,46 @@ def scrape_indeed_list_url(url):
             created_jobs.append(job)
         else:
             updated_jobs.append(job)
+    return created_jobs, updated_jobs
+
+
+def scrape_indeed_by_query(q, l="Brasil"):
+    started_at = timezone.now()
+    logger.info(f"Starting scrape_indeed_by_query({q=}, {l=})")
+    scraper = IndeedScraper()
+    params = {"q": q, "l": l}
+    url = scraper.get_query_url(params)
+
+    parser = scraper.get_parsed_search_page(url=url)
+    logger.info(f"Found {len(parser.get_jobs_count())} jobs")
+    jobcards = parser.get_mosaic_provider_jobcards()
+    created_jobs, updated_jobs = save_jobcards(jobcards)
+    next_page_url = parser.get_next_page_url()
+
+    while next_page_url:
+        parser = scraper.get_parsed_search_page(url=next_page_url)
+        jobcards = parser.get_mosaic_provider_jobcards()
+        c, u = save_jobcards(jobcards)
+        created_jobs += c
+        updated_jobs += u
+        next_page_url = parser.get_next_page_url()
+
+    finished_at = timezone.now()
+    logger.info(
+        f"Finishing scrape_indeed_by_query({q=}, {l=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, {len(parser.path)} pages scraped, took {finished_at - started_at}"
+    )
+    return created_jobs, updated_jobs
+
+
+def scrape_indeed_list_url(url):
+    # Só está retornando a primeira página
+    started_at = timezone.now()
+    logger.info(f"Starting scrape_indeed_list_url({url=})")
+    scraper = IndeedScraper()
+
+    parser = scraper.get_parsed_search_page(url=url)
+    jobcards = parser.get_mosaic_provider_jobcards()
+    created_jobs, updated_jobs = save_jobcards(jobcards)
 
     finished_at = timezone.now()
     logger.info(

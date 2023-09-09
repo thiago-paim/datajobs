@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from jobs.models import Job
 from jobs.tasks import scrape_indeed_list_url
 from jobs.utils import export
@@ -15,6 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         url = options["url"]
+        logger.info(f"Scraping Indeed jobs on {url=}")
 
         created, updated = scrape_indeed_list_url(url)
         job_ids = [job.id for job in created + updated]
@@ -22,4 +23,4 @@ class Command(BaseCommand):
         logger.info(f"Found {len(jobs)} jobs")
 
         filepath = export(jobs)
-        logger.info(f"Saved on {filepath}")
+        logger.info(f"Jobs exported to {filepath}")
