@@ -7,11 +7,6 @@ from jobs.scrapers import IndeedScraper
 from jobs.tasks import scrape_indeed_list_url
 
 
-class IndeedJobFormTest(TestCase):
-    def test_valid_job(self):
-        ...
-
-
 class IndeedJobsListParserTest(TestCase):
     def test_get_job_cards(self):
         parser = IndeedJobsListParser(pages["search-results-full"])
@@ -47,6 +42,9 @@ class IndeedJobsListParserTest(TestCase):
         )
 
     def test_get_mosaic_trimmed_jobcards(self):
+        ...
+
+    def test_get_jobs_count(self):
         ...
 
 
@@ -141,3 +139,6 @@ class JobTasksTest(TestCase):
             created_jobkeys,
             [job["jobkey"] for job in mosaic_jobcards["search-results-full-mosaic"]],
         )
+
+    def test_scrape_indeed_by_query(self):
+        ...

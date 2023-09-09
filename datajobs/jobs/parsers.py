@@ -72,6 +72,7 @@ class IndeedJobsListParser:
         else:
             return None
 
+    # TODO: Remove this method
     def get_job_from_card(self, card):
         job = {
             "title": None,
@@ -107,6 +108,7 @@ class IndeedJobsListParser:
 
         return job
 
+    # TODO: Remove this method
     def get_job_cards(self):
         self.jobs = []
 

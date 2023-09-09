@@ -43,7 +43,7 @@ def scrape_indeed_by_query(q, l="Brasil"):
 
     finished_at = timezone.now()
     logger.info(
-        f"Finishing scrape_indeed_by_query({q=}, {l=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, {len(parser.path)} pages scraped, took {finished_at - started_at}"
+        f"Finishing scrape_indeed_by_query({q=}, {l=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, {len(scraper.path)} pages scraped, took {finished_at - started_at}"
     )
     return created_jobs, updated_jobs
 
