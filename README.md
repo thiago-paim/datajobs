@@ -52,15 +52,6 @@
     * Then use it to login into the admin: http://localhost:8000/admin/
 
 
-<!-- * To monitor running tasks check Celery Flower: http://localhost:8888/
-
-* In case you want to stop all the tasks, you can purge the tasks queue:
-
-    ```bash
-    docker exec -it datajobs-celery-1 celery -A datajobs purge
-    ``` -->
-
-
 ### Testing
 
 * Run automated tests:
