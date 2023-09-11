@@ -1,15 +1,22 @@
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 import json
 import logging
+from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
 
-class IndeedJobParser:
+class PageParser:
+    def __init__(self, page: str) -> None:
+        self.soup = BeautifulSoup(page, "html.parser")
+
+
+class IndeedJobParser(PageParser):
     """Parser for Indeed job pages."""
 
-    def __init__(self, page):
-        self.soup = BeautifulSoup(page, "html.parser")
+    def __init__(self, page: str) -> None:
+        super().__init__(page)
         self.job = self.get_job()
 
     def get_job(self):
@@ -59,13 +66,10 @@ class IndeedJobParser:
         return job
 
 
-class IndeedJobsListParser:
+class IndeedJobsListParser(PageParser):
     """Parser for Indeed search results pages."""
 
-    def __init__(self, page):
-        self.soup = BeautifulSoup(page, "html.parser")
-
-    def get_jobs_count(self):
+    def get_jobs_count(self) -> Optional[str]:
         count = self.soup.select("div.jobsearch-JobCountAndSortPane-jobCount")
         if count:
             return count[0].text.split(" ")[0]
@@ -73,8 +77,8 @@ class IndeedJobsListParser:
             return None
 
     # TODO: Remove this method
-    def get_job_from_card(self, card):
-        job = {
+    def get_job_from_card(self, card: Tag) -> Dict:
+        job: Dict[str, Optional[str]] = {
             "title": None,
             "data-jk": None,
             "href": None,
@@ -109,8 +113,8 @@ class IndeedJobsListParser:
         return job
 
     # TODO: Remove this method
-    def get_job_cards(self):
-        self.jobs = []
+    def get_job_cards(self) -> List[Dict]:
+        self.jobs: List = []
 
         jobcards = self.soup.select("div#mosaic-provider-jobcards div.slider_container")
         for card in jobcards:
@@ -122,21 +126,21 @@ class IndeedJobsListParser:
 
         return self.jobs
 
-    def get_next_page_url(self):
+    def get_next_page_url(self) -> Optional[str]:
         next_page = self.soup.select("link[rel='next']")
         if next_page:
             return next_page[0].attrs["href"]
         else:
             return None
 
-    def get_previous_page_url(self):
+    def get_previous_page_url(self) -> Optional[str]:
         prev_page = self.soup.select("link[rel='prev']")
         if prev_page:
             return prev_page[0].attrs["href"]
         else:
             return None
 
-    def get_mosaic_provider_jobcards(self):
+    def get_mosaic_provider_jobcards(self) -> Optional[List[Dict]]:
         script = self.soup.select("script#mosaic-data")
         if not script:
             return None

@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
+from typing import Dict
 
 
 class Job(models.Model):
@@ -16,7 +17,7 @@ class Job(models.Model):
     benefits = models.TextField(blank=True)
     html = models.TextField(blank=True)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         d = model_to_dict(self)
         d.pop("id")
         d.pop("html")
@@ -25,5 +26,5 @@ class Job(models.Model):
         d["updated"] = self.updated.isoformat()
         return d
 
-    def get_complete_url(self):
+    def get_complete_url(self) -> str:
         return f"https://www.indeed.com/viewjob?jk={self.jobkey}"
