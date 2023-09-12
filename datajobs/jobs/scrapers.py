@@ -69,11 +69,11 @@ class IndeedScraper(BaseScraper):
         return self.get_page(url)
 
     # TODO: Refactor this method
-    def query_jobs(self, q: str, l: Optional[str] = "Brasil") -> List[Dict]:
+    def query_jobs(self, query: str, location: Optional[str] = "Brasil") -> List[Dict]:
         """Executes a query and returns the jobs found (across all pages)."""
         params = {
-            "q": q,
-            "l": l,
+            "q": query,
+            "l": location,
         }
         jobs: List[Dict] = []
 

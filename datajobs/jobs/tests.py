@@ -105,7 +105,7 @@ class IndeedScraperTest(TestCase):
             ),
         ]
         scraper = IndeedScraper()
-        jobs = scraper.query_jobs(q="python+dados", l="Brasil")
+        jobs = scraper.query_jobs(query="python+dados", location="Brasil")
 
         search_jobs_by_url_mock.assert_has_calls(
             [

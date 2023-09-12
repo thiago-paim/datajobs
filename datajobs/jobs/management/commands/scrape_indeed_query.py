@@ -12,19 +12,19 @@ class Command(BaseCommand):
     help = "Scrape Indeed jobs for a given query and location"
 
     def add_arguments(self, parser):
-        parser.add_argument("q", type=str)
-        parser.add_argument("l", type=str)
+        parser.add_argument("query", type=str)
+        parser.add_argument("location", type=str)
 
     def handle(self, *args, **options):
-        q = options["q"]
-        l = options["l"]
-        logger.info(f"Scraping Indeed jobs for {q=} and {l=}")
+        query = options["q"]
+        location = options["l"]
+        logger.info(f"Scraping Indeed jobs for {query=} and {location=}")
 
-        created, updated = scrape_indeed_by_query(q, l)
+        created, updated = scrape_indeed_by_query(query, location)
         job_ids = [job.id for job in created + updated]
         jobs = Job.objects.filter(id__in=job_ids)
         logger.info(f"Found {len(jobs)} jobs")
 
-        filename = f"q={q}&l={l}"
+        filename = f"q={query}&l={location}"
         filepath = export(jobs, filename=filename)
         logger.info(f"Jobs exported to {filepath}")

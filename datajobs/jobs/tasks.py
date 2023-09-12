@@ -21,11 +21,11 @@ def save_jobcards(jobcards):
     return created_jobs, updated_jobs
 
 
-def scrape_indeed_by_query(q, l="Brasil"):
+def scrape_indeed_by_query(query, location="Brasil"):
     started_at = timezone.now()
-    logger.info(f"Starting scrape_indeed_by_query({q=}, {l=})")
+    logger.info(f"Starting scrape_indeed_by_query({query=}, {location=})")
     scraper = IndeedScraper()
-    params = {"q": q, "l": l}
+    params = {"q": query, "l": location}
     url = scraper.get_query_url(params)
 
     parser = scraper.get_parsed_search_page(url=url)
@@ -44,7 +44,7 @@ def scrape_indeed_by_query(q, l="Brasil"):
 
     finished_at = timezone.now()
     logger.info(
-        f"Finishing scrape_indeed_by_query({q=}, {l=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, {len(scraper.path)} pages scraped, took {finished_at - started_at}"
+        f"Finishing scrape_indeed_by_query({query=}, {location=}): {len(created_jobs)} jobs created, {len(updated_jobs)} jobs updated, {len(scraper.path)} pages scraped, took {finished_at - started_at}"
     )
     return created_jobs, updated_jobs
 
@@ -67,14 +67,14 @@ def scrape_indeed_list_url(url):
 
 
 # TODO: Refactor
-def scrape_indeed_query(q):
+def scrape_indeed_query(query):
     """
     Scrapes Indeed jobs for a given query.
     """
     started_at = timezone.now()
-    logger.info(f"Starting scrape_indeed_query({q=})")
+    logger.info(f"Starting scrape_indeed_query({query=})")
     scraper = IndeedScraper()
-    jobs = scraper.query_jobs(q=q)
+    jobs = scraper.query_jobs(query=query)
 
     created = []
     updated = []
@@ -93,6 +93,6 @@ def scrape_indeed_query(q):
 
     finished_at = timezone.now()
     logger.info(
-        f"Finishing scrape_indeed_query({q=}): {len(created)} jobs created, {len(updated)} jobs updated, took {finished_at - started_at}"
+        f"Finishing scrape_indeed_query({query=}): {len(created)} jobs created, {len(updated)} jobs updated, took {finished_at - started_at}"
     )
     return created, updated
