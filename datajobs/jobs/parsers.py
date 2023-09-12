@@ -1,8 +1,9 @@
-from bs4 import BeautifulSoup
-from bs4.element import Tag
 import json
 import logging
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,10 @@ class IndeedJobParser(PageParser):
         if company_info:
             job["company_info"] = company_info[0].get_text().strip("\n")
 
+        description = self.soup.select("div#jobDescriptionText")
+        if description:
+            job["description"] = description[0].get_text().strip("\n")
+
         # apply_button = self.soup.select("div#applyButtonLinkContainer button")
         # if apply_button:
         #     job["apply_url"] = apply_button[0].attrs["href"]
@@ -54,10 +59,6 @@ class IndeedJobParser(PageParser):
         # benefits = self.soup.select("div#benefits")
         # if benefits:
         #     job["benefits"] = str(benefits[0])
-
-        description = self.soup.select("div#jobDescriptionText")
-        if description:
-            job["description"] = description[0].get_text().strip("\n")
 
         # salary_and_job_info = self.soup.select("div#salaryInfoAndJobType")
         # if salary_and_job_info:

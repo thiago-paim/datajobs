@@ -1,7 +1,8 @@
 if __name__ == "__main__":
     """Sample script for testing Chrome installation and undetected_chromedriver"""
-    import undetected_chromedriver as uc
     import time
+
+    import undetected_chromedriver as uc
 
     driver = uc.Chrome(headless=True, use_subprocess=False)
     driver.get("https://www.google.com")

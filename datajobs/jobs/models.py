@@ -1,6 +1,7 @@
+from typing import Dict
+
 from django.db import models
 from django.forms.models import model_to_dict
-from typing import Dict
 
 
 class Job(models.Model):

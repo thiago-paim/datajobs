@@ -1,12 +1,11 @@
-from django.utils import timezone
 import logging
 import time
 import traceback
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
+
 import undetected_chromedriver as uc
-
-from jobs.parsers import IndeedJobsListParser, IndeedJobParser
-
+from django.utils import timezone
+from jobs.parsers import IndeedJobParser, IndeedJobsListParser
 
 logger = logging.getLogger(__name__)
 
@@ -58,27 +57,6 @@ class IndeedScraper(BaseScraper):
 
     def get_query_url(self, params: dict) -> str:
         return self.search_page_address + self.format_url_params(params)
-
-    # def get_page(self, url):
-    #     """Uses undetected Chrome driver to get a page HTML."""
-    #     logger.info(f"IndeedScraper.get_page({url=})")
-    #     url = self.base_url + url
-    #     self.path.append(url)
-    #     driver = uc.Chrome(headless=True, use_subprocess=False)
-
-    #     try:
-    #         driver.get(url)
-    #         page_source = driver.page_source
-    #     except Exception as exc:
-    #         tb = traceback.format_exc()
-    #         logger.error(f"IndeedScraper.get_page({url=}: {exc}:\n{tb}")
-    #         raise exc
-
-    #     if self.interval:
-    #         time.sleep(self.interval)
-
-    #     driver.quit()
-    #     return page_source
 
     def get_parsed_search_page(self, url: str) -> IndeedJobsListParser:
         page_source = self.get_page(url)

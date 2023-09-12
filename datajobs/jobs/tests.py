@@ -1,8 +1,8 @@
-from unittest.mock import patch, call
-from django.test import TestCase
+from unittest.mock import call, patch
 
-from jobs.fixtures.indeed import pages, job_cards, job_details, mosaic_jobcards
-from jobs.parsers import IndeedJobsListParser, IndeedJobParser
+from django.test import TestCase
+from jobs.fixtures.indeed import job_cards, job_details, mosaic_jobcards, pages
+from jobs.parsers import IndeedJobParser, IndeedJobsListParser
 from jobs.scrapers import IndeedScraper
 from jobs.tasks import scrape_indeed_list_url
 

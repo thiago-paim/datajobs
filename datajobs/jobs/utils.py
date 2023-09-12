@@ -1,7 +1,6 @@
+import pandas as pd
 from django.conf import settings
 from django.utils import timezone
-
-import pandas as pd
 
 
 def export(queryset, filename=None):

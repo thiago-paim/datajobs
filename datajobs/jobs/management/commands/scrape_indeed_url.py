@@ -1,8 +1,9 @@
+import logging
+
 from django.core.management.base import BaseCommand
 from jobs.models import Job
 from jobs.tasks import scrape_indeed_list_url
 from jobs.utils import export
-import logging
 
 logger = logging.getLogger(__name__)
 

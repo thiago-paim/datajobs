@@ -1,7 +1,8 @@
-from django.utils import timezone
 import logging
-from jobs.scrapers import IndeedScraper
+
+from django.utils import timezone
 from jobs.models import Job
+from jobs.scrapers import IndeedScraper
 
 logger = logging.getLogger(__name__)
 
