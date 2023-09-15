@@ -16,8 +16,8 @@ class Command(BaseCommand):
         parser.add_argument("location", type=str)
 
     def handle(self, *args, **options):
-        query = options["q"]
-        location = options["l"]
+        query = options["query"]
+        location = options["location"]
         logger.info(f"Scraping Indeed jobs for {query=} and {location=}")
 
         created, updated = scrape_indeed_by_query(query, location)
