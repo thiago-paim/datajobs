@@ -20,7 +20,7 @@ class BaseScraper:
         logger.info(f"BaseScraper.get_page({url=})")
         url = self.base_url + url
         self.path.append(url)
-        driver = uc.Chrome(headless=True, use_subprocess=False)
+        driver = uc.Chrome(headless=True, use_subprocess=False, version_main=116)
 
         try:
             driver.get(url)
@@ -44,7 +44,7 @@ class IndeedScraper(BaseScraper):
     search_page_address = "/jobs"
     job_page_address = "/viewjob"
 
-    def format_url_params(self, params: dict) -> str:
+    def _format_url_params(self, params: dict) -> str:
         if not params:
             return ""
         return "?" + "&".join([f"{k}={v}" for k, v in params.items()])
@@ -53,20 +53,14 @@ class IndeedScraper(BaseScraper):
         params = {
             "jk": jk,
         }
-        return self.job_page_address + self.format_url_params(params)
+        return self.job_page_address + self._format_url_params(params)
 
     def get_query_url(self, params: dict) -> str:
-        return self.search_page_address + self.format_url_params(params)
+        return self.search_page_address + self._format_url_params(params)
 
     def get_parsed_search_page(self, url: str) -> IndeedJobsListParser:
         page_source = self.get_page(url)
         return IndeedJobsListParser(page_source)
-
-    # TODO: Refactor to return parsed page
-    def get_job_details(self, jk: str) -> str:
-        """Returns the HTML of a job details page."""
-        url = self.get_job_url(jk)
-        return self.get_page(url)
 
     # TODO: Refactor this method
     def query_jobs(self, query: str, location: Optional[str] = "Brasil") -> List[Dict]:
@@ -112,3 +106,9 @@ class IndeedScraper(BaseScraper):
             f"Finishing IndeedScraper.search_jobs_by_url({url=}): {len(jobs)} jobs found, took {finished_at - started_at}"
         )
         return jobs, n
+
+    # TODO: Refactor to return parsed page
+    def get_job_details(self, jk: str) -> str:
+        """Returns the HTML of a job details page."""
+        url = self.get_job_url(jk)
+        return self.get_page(url)
