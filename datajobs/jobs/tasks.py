@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 def save_jobcards(jobcards):
+    if not jobcards:
+        return [], []
+
     created_jobs = []
     updated_jobs = []
     for jobcard in jobcards:
