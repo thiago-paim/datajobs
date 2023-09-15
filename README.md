@@ -29,7 +29,7 @@
 * To scrape a query from Indeed:
 
     ```bash
-    docker exec -it datajobs-django-1 python3 scrape_indeed_query "python+dados" "Remoto"
+    docker exec -it datajobs-django-1 python3 manage.py scrape_indeed_query "python+dados" "Remoto"
     ```
 
 * To stop your app:
@@ -75,6 +75,13 @@
     created, updated = scrape_indeed_list_url(url)
     ```
 
+    ```python
+    from jobs.scrapers import IndeedScraper
+    scraper = IndeedScraper()
+    params = {"q": "python+django", "l": "Remoto"}
+    url = scraper.get_query_url(params)
+    parser = scraper.get_parsed_search_page(url=url)
+    ```
 
 
 #### Errors found
